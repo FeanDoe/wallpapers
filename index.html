@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wallpapers.tugurio.cl</title>
+<meta name="description" content="Fuente de wallpapers en JSON para la extensión Random Wallpaper de GNOME.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fafaf9; --fg: #1c1917; --muted: #57534e; --line: #e7e5e4;
+    --code-bg: #f5f5f4; --accent: #0f766e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1917; --fg: #f5f5f4; --muted: #a8a29e; --line: #44403c;
+      --code-bg: #292524; --accent: #5eead4;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 44rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+  h1 { font-size: 1.9rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.15rem; margin: 2.5rem 0 .75rem; }
+  p, li { color: var(--muted); }
+  strong, h1, h2 { color: var(--fg); }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .9em; }
+  code { background: var(--code-bg); padding: .1em .35em; border-radius: 4px; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem; overflow-x: auto; line-height: 1.45;
+  }
+  pre code { background: none; padding: 0; }
+  .lead { font-size: 1.05rem; margin-top: 0; }
+  .config { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1rem; align-items: baseline;
+    border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
+  .config dt { font-weight: 600; }
+  .config dd { margin: 0; overflow-wrap: anywhere; }
+  @media (max-width: 480px) { .config { grid-template-columns: 1fr; } .config dd { margin-bottom: .5rem; } }
+  ol li { margin-bottom: .4rem; }
+  figure { margin: 2.5rem 0 0; }
+  figure img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; display: block;
+    background: var(--code-bg); }
+  figcaption { color: var(--muted); font-size: .85rem; margin-top: .4rem; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>wallpapers.tugurio.cl</h1>
+  <p class="lead">Fuente de wallpapers para la extensión
+    <a href="https://extensions.gnome.org/extension/1040/random-wallpaper/">Random Wallpaper</a>
+    de GNOME (<a href="https://github.com/ifl0w/RandomWallpaperGnome3">ifl0w/RandomWallpaperGnome3</a>).
+    <span id="count"></span></p>
+
+  <h2>Cómo agregarla</h2>
+  <ol>
+    <li>Instala <strong>Random Wallpaper</strong> desde
+      <a href="https://extensions.gnome.org/extension/1040/random-wallpaper/">extensions.gnome.org</a>
+      o con el gestor de extensiones de tu distribución.</li>
+    <li>Abre la configuración de la extensión y agrega una nueva fuente.</li>
+    <li>Elige el tipo <strong>Generic JSON</strong> y completa:</li>
+  </ol>
+  <dl class="config">
+    <dt>Request URL</dt><dd><code>https://wallpapers.tugurio.cl/wallpapers.json</code></dd>
+    <dt>Image JSON Path</dt><dd><code>$[@random].url</code></dd>
+  </dl>
+  <p>El resto de los campos se puede dejar vacío. <code>@random</code> hace que la extensión
+    elija un wallpaper distinto cada vez.</p>
+
+  <h2>Formato del JSON</h2>
+  <p><a href="wallpapers.json"><code>wallpapers.json</code></a> es un arreglo de objetos, uno por imagen,
+    con un solo campo <code>url</code> que apunta a la imagen en este mismo sitio:</p>
+  <pre><code>[
+  { "url": "https://wallpapers.tugurio.cl/20191020_140043.jpg" },
+  { "url": "https://wallpapers.tugurio.cl/P1112992%282%29.jpg" },
+  …
+]</code></pre>
+  <p>Sirve con cualquier programa que acepte una lista de URLs en JSON. Más detalles en la
+    <a href="https://github.com/ifl0w/RandomWallpaperGnome3/wiki/Generic-JSON-Source">documentación de Generic JSON Source</a>.</p>
+
+  <figure id="preview" hidden>
+    <a id="preview-link"><img id="preview-img" alt="Wallpaper al azar de la colección" loading="lazy"></a>
+    <figcaption>Uno al azar. Recarga para ver otro.</figcaption>
+  </figure>
+
+  <footer>Las fotos se publican sin metadatos, salvo la fecha.</footer>
+</main>
+<script>
+  fetch("wallpapers.json")
+    .then(r => r.json())
+    .then(list => {
+      if (!list.length) return;
+      document.getElementById("count").textContent =
+        `Hay ${list.length} wallpaper${list.length === 1 ? "" : "s"}.`;
+      const { url } = list[Math.floor(Math.random() * list.length)];
+      document.getElementById("preview-img").src = url;
+      document.getElementById("preview-link").href = url;
+      document.getElementById("preview").hidden = false;
+    })
+    .catch(() => {});
+</script>
+</body>
+</html>

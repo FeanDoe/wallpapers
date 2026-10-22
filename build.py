@@ -32,6 +32,7 @@ def main():
 
     data = [{"url": f"{BASE_URL}/{quote(img.name)}"} for img in images]
     (OUT / "wallpapers.json").write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    shutil.copy2(Path(__file__).parent / "index.html", OUT / "index.html")
     (OUT / "CNAME").write_text("wallpapers.tugurio.cl\n")
     (OUT / ".nojekyll").touch()
     print(f"{len(images)} wallpapers -> {OUT / 'wallpapers.json'}")
