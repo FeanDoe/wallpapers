@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 from urllib.parse import quote
 
+from exif import clean_dir
+
 BASE_URL = os.environ.get("BASE_URL", "https://wallpapers.tugurio.cl").rstrip("/")
 SRC = Path(__file__).parent / "wallpapers"
 OUT = Path(__file__).parent / "_site"
@@ -18,6 +20,10 @@ def main():
     images = sorted(p for p in SRC.iterdir() if p.is_file() and p.suffix.lower() in EXTS)
     if not images:
         sys.exit(f"No hay imágenes en {SRC}")
+    dirty = clean_dir(SRC, write=False)
+    if dirty:
+        sys.exit("Imágenes con metadata (corre `python3 exif.py` antes de hacer commit):\n"
+                 + "\n".join(f"  {p.name}" for p in dirty))
 
     shutil.rmtree(OUT, ignore_errors=True)
     OUT.mkdir()
